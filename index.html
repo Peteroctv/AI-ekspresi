@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080b16">
+    <meta name="description" content="AI Expression Lab — aplikasi pengenalan ekspresi wajah menggunakan Teachable Machine.">
+
+    <title>AI Expression Lab | Smart Vision</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Pustaka AI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="#" class="brand" aria-label="AI Expression Lab Beranda">
+            <span class="brand-icon">✳</span>
+            <span>AI<span class="brand-accent">Expression</span></span>
+            <span class="brand-lab">LAB</span>
+        </a>
+
+        <div class="header-status">
+            <span class="status-indicator" id="status-indicator"></span>
+            <span id="status">Sistem siap</span>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-label">
+                <span class="hero-label-dot"></span>
+                ARTIFICIAL INTELLIGENCE LAB
+            </div>
+
+            <h1>
+                Understand the face.<br>
+                <span>Explore the emotion.</span>
+            </h1>
+
+            <p class="hero-description">
+                Eksplorasi teknologi pengenalan ekspresi wajah secara langsung
+                menggunakan model AI yang kamu latih sendiri.
+            </p>
+
+            <div class="hero-tags">
+                <span>✦ Real-time prediction</span>
+                <span>✦ Custom AI model</span>
+                <span>✦ Browser-based</span>
+            </div>
+        </section>
+
+        <!-- MODEL CONFIGURATION -->
+        <section class="card model-card">
+            <div class="section-heading">
+                <div class="section-icon">⌘</div>
+
+                <div>
+                    <h2>Konfigurasi Model</h2>
+                    <p>Hubungkan model Teachable Machine milikmu.</p>
+                </div>
+
+                <span class="step-badge">STEP 01</span>
+            </div>
+
+            <form id="model-form">
+                <label for="model-url">URL Model Teachable Machine</label>
+
+                <div class="url-row">
+                    <div class="input-wrap">
+                        <span class="input-icon">↗</span>
+
+                        <input
+                            type="url"
+                            id="model-url"
+                            placeholder="https://teachablemachine.withgoogle.com/models/..."
+                            autocomplete="url"
+                            spellcheck="false"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="button button-primary" id="load-model-btn">
+                        <span id="load-button-icon">↓</span>
+                        <span id="load-button-text">Muat Model</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="model-info">
+                <span class="info-icon">ⓘ</span>
+                <p>Gunakan URL berbagi model yang sudah dilatih dan diekspor dari Teachable Machine. Model akan dimuat melalui koneksi internet.</p>
+            </div>
+
+            <p class="inline-message" id="url-message" role="status" aria-live="polite">
+                Masukkan URL model, kemudian tekan Muat Model.
+            </p>
+        </section>
+
+        <!-- MAIN DASHBOARD -->
+        <section class="dashboard">
+
+            <!-- CAMERA -->
+            <article class="card camera-card">
+                <div class="section-heading">
+                    <div class="section-icon">◉</div>
+
+                    <div>
+                        <h2>Live Camera</h2>
+                        <p>Area pengambilan gambar</p>
+                    </div>
+
+                    <span class="live-badge" id="camera-badge">
+                        <span class="live-dot"></span>
+                        STANDBY
+                    </span>
+                </div>
+
+                <div class="camera-frame" id="camera-frame">
+                    <div class="camera-grid"></div>
+
+                    <div class="camera-placeholder" id="placeholder">
+                        <div class="camera-symbol">◎</div>
+                        <h3>Ready to scan</h3>
+                        <p>Muat model AI, lalu aktifkan kamera untuk memulai analisis.</p>
+                    </div>
+
+                    <div id="webcam-container" class="webcam-container"></div>
+
+                    <div class="camera-overlay overlay-top-left"></div>
+                    <div class="camera-overlay overlay-top-right"></div>
+                    <div class="camera-overlay overlay-bottom-left"></div>
+                    <div class="camera-overlay overlay-bottom-right"></div>
+
+                    <div class="camera-label" id="camera-label">
+                        CAMERA OFF
+                    </div>
+                </div>
+
+                <div class="camera-controls">
+                    <button type="button" class="button button-primary button-large" id="start-btn" disabled>
+                        <span>▶</span>
+                        Mulai Kamera
+                    </button>
+
+                    <button type="button" class="button button-secondary button-large" id="stop-btn" disabled>
+                        <span>■</span>
+                        Hentikan
+                    </button>
+                </div>
+
+                <div class="camera-message">
+                    <span class="message-icon">ⓘ</span>
+                    <p id="message" role="status" aria-live="polite">
+                        Muat model AI terlebih dahulu.
+                    </p>
+                </div>
+            </article>
+
+            <!-- RESULTS -->
+            <article class="card results-card">
+                <div class="section-heading">
+                    <div class="section-icon">⌁</div>
+
+                    <div>
+                        <h2>AI Analysis</h2>
+                        <p>Hasil prediksi model</p>
+                    </div>
+
+                    <span class="step-badge">STEP 02</span>
+                </div>
+
+                <div class="result-highlight">
+                    <div class="result-topline">
+                        <span class="result-label">PREDIKSI UTAMA</span>
+                        <span class="result-spark">✦</span>
+                    </div>
+
+                    <div class="result-expression" id="top-expression">
+                        Menunggu analisis
+                    </div>
+
+                    <div class="result-bottom">
+                        <div>
+                            <span class="muted-small">Tingkat keyakinan model</span>
+                            <div class="result-score" id="top-score">--</div>
+                        </div>
+
+                        <div class="confidence-ring" id="confidence-ring" style="--progress: 0deg">
+                            <span id="ring-score">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scores-header">
+                    <div>
+                        <h3>Skor Setiap Kelas</h3>
+                        <p>Perbandingan probabilitas model</p>
+                    </div>
+
+                    <span class="class-count" id="class-count">0 kelas</span>
+                </div>
+
+                <div class="predictions" id="predictions">
+                    <div class="empty-result">
+                        <span class="empty-icon">⌁</span>
+                        <p>Hasil prediksi akan muncul di sini.</p>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button type="button" class="button button-secondary copy-button" id="copy-btn" disabled>
+                        <span>▣</span>
+                        Salin Hasil
+                    </button>
+
+                    <span class="last-updated" id="last-updated">Belum ada analisis</span>
+                </div>
+            </article>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="how-section">
+            <div class="how-heading">
+                <span class="eyebrow">HOW IT WORKS</span>
+                <h2>Dari kamera menjadi prediksi.</h2>
+                <p>Empat tahap sederhana yang bekerja di browser.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <span class="step-number">01</span>
+                    <div class="step-icon">↗</div>
+                    <h3>Load Model</h3>
+                    <p>Hubungkan model yang sudah dilatih melalui URL.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">02</span>
+                    <div class="step-icon">◎</div>
+                    <h3>Capture Image</h3>
+                    <p>Kamera mengambil gambar secara langsung.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">03</span>
+                    <div class="step-icon">✳</div>
+                    <h3>AI Prediction</h3>
+                    <p>Model membandingkan gambar dengan kelas pelatihan.</p>
+                </div>
+
+                <div class="step-card">
+                    <span class="step-number">04</span>
+                    <div class="step-icon">⌁</div>
+                    <h3>View Results</h3>
+                    <p>Hasil prediksi dan skor ditampilkan di layar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DISCLAIMER -->
+        <aside class="disclaimer">
+            <span>ⓘ</span>
+            <p>
+                Hasil merupakan prediksi model berdasarkan data pelatihan,
+                bukan bukti pasti mengenai perasaan atau keadaan emosional seseorang.
+                Pemrosesan gambar dilakukan melalui model di browser ini.
+            </p>
+        </aside>
+
+        <footer class="footer">
+            <a href="#" class="footer-brand">AI Expression Lab<span>.</span></a>
+            <p>Built for learning · Powered by Teachable Machine</p>
+            <span class="footer-year">HTML · CSS · JavaScript</span>
+        </footer>
+    </main>
+</body>
+</html>
